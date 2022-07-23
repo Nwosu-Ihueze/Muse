@@ -16,6 +16,8 @@ contract Muse is ERC4610{
     // Mapping owner address to token count
     mapping(uint256 => uint256) private _balances;
 
+    uint public totalSupply;
+
     event minted(uint id, string image, uint timeCreated);
 
     event rented(uint id, string image, address owner, address renter);
@@ -34,6 +36,7 @@ contract Muse is ERC4610{
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
+        totalSupply += 1;
         emit minted(tokenId, uri, block.timestamp);
     }
 
