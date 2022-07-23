@@ -16,6 +16,11 @@ contract Muse is ERC4610{
     // Mapping owner address to token count
     mapping(uint256 => uint256) private _balances;
 
+    event minted(uint id, string image, uint timeCreated);
+
+    event rented(uint id, string image, address owner, address renter);
+
+    event withdrawn(uint id, string image, address owner, uint amount);
 
     constructor() ERC4610("Muse", "muse") {}
 
@@ -29,6 +34,7 @@ contract Muse is ERC4610{
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
+        emit minted(tokenId, uri, block.timestamp);
     }
 
     function delegate(uint tokenId) public payable{
@@ -38,6 +44,7 @@ contract Muse is ERC4610{
         require(msg.value == 0.1 ether);
         _setDelegator(msg.sender, tokenId);
         _balances[tokenId] += msg.value;
+        emit rented(tokenId, _tokenURIs[tokenId],owner,msg.sender);
     }
 
     function withdraw(uint tokenId) public{
@@ -46,5 +53,6 @@ contract Muse is ERC4610{
         require(msg.sender == owner, "ERC4610: setDelegator to current owner");
         (bool success,) = msg.sender.call{value:_balances[tokenId]}("");
         require(success,"withdraw failed");
+        emit withdrawn(tokenId, _tokenURIs[tokenId], owner, _balances[tokenId]);
     }
 }
