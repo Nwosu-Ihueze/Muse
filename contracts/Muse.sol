@@ -11,7 +11,7 @@ contract Muse is ERC4610{
     using Strings for uint256;
 
     // Optional mapping for token URIs
-    mapping(uint256 => string) private _tokenURIs;
+    mapping(uint256 => string) public _tokenURIs;
 
     // Mapping owner address to token count
     mapping(uint256 => uint256) private _balances;
