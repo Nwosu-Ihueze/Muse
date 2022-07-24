@@ -30,6 +30,7 @@ We decided to provide this missing piece through Muse. Our smart contract saw th
 - Polygon
 - React
 - IPFS
+- The Graph
 
 ### Contract Address
 
