@@ -11,11 +11,19 @@ contract Muse is ERC4610{
     using Strings for uint256;
 
     // Optional mapping for token URIs
-    mapping(uint256 => string) private _tokenURIs;
+    mapping(uint256 => string) public _tokenURIs;
 
+    mapping(address => string[]) private _myNFts;
     // Mapping owner address to token count
     mapping(uint256 => uint256) private _balances;
 
+    uint public totalSupply;
+
+    event minted(uint id, string image, uint timeCreated);
+
+    event rented(uint id, string image, address owner, address renter);
+
+    event withdrawn(uint id, string image, address owner, uint amount);
 
     constructor() ERC4610("Muse", "muse") {}
 
@@ -29,6 +37,8 @@ contract Muse is ERC4610{
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
+        totalSupply += 1;
+        emit minted(tokenId, uri, block.timestamp);
     }
 
     function delegate(uint tokenId) public payable{
@@ -38,6 +48,8 @@ contract Muse is ERC4610{
         require(msg.value == 0.1 ether);
         _setDelegator(msg.sender, tokenId);
         _balances[tokenId] += msg.value;
+        _myNFts[msg.sender].push(_tokenURIs[tokenId]);
+        emit rented(tokenId, _tokenURIs[tokenId],owner,msg.sender);
     }
 
     function withdraw(uint tokenId) public{
@@ -46,5 +58,11 @@ contract Muse is ERC4610{
         require(msg.sender == owner, "ERC4610: setDelegator to current owner");
         (bool success,) = msg.sender.call{value:_balances[tokenId]}("");
         require(success,"withdraw failed");
+        emit withdrawn(tokenId, _tokenURIs[tokenId], owner, _balances[tokenId]);
     }
+
+    function myNFTs() public view returns(string[] memory){
+        return _myNFts[msg.sender];
+    }
+
 }
