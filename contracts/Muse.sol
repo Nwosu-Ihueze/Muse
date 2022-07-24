@@ -13,6 +13,9 @@ contract Muse is ERC4610{
     // Optional mapping for token URIs
     mapping(uint256 => string) public _tokenURIs;
 
+    mapping(address => mapping(uint => bool)) private _rented;
+
+    mapping(address => string[]) private _myNFts;
     // Mapping owner address to token count
     mapping(uint256 => uint256) private _balances;
 
@@ -23,6 +26,8 @@ contract Muse is ERC4610{
     event rented(uint id, string image, address owner, address renter);
 
     event withdrawn(uint id, string image, address owner, uint amount);
+
+    string[] NFTs;
 
     constructor() ERC4610("Muse", "muse") {}
 
@@ -44,9 +49,12 @@ contract Muse is ERC4610{
         address owner = ownerOf(tokenId);
         require(!checkDelegates(msg.sender,tokenId),"asset cannot be delegated more than once");
         require(_msgSender() != owner, "ERC4610: setDelegator to current owner");
+        require(!_rented[msg.sender][tokenId],"you cannot rent same asset more than once");
         require(msg.value == 0.1 ether);
         _setDelegator(msg.sender, tokenId);
         _balances[tokenId] += msg.value;
+        _rented[msg.sender][tokenId] = true;
+        _myNFts[msg.sender].push(_tokenURIs[tokenId]);
         emit rented(tokenId, _tokenURIs[tokenId],owner,msg.sender);
     }
 
@@ -58,4 +66,9 @@ contract Muse is ERC4610{
         require(success,"withdraw failed");
         emit withdrawn(tokenId, _tokenURIs[tokenId], owner, _balances[tokenId]);
     }
+
+    function myNFTs() public view returns(string[] memory){
+        return _myNFts[msg.sender];
+    }
+
 }
