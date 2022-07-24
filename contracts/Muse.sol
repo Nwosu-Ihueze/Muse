@@ -25,8 +25,6 @@ contract Muse is ERC4610{
 
     event withdrawn(uint id, string image, address owner, uint amount);
 
-    string[] NFTs;
-
     constructor() ERC4610("Muse", "muse") {}
 
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
@@ -47,7 +45,6 @@ contract Muse is ERC4610{
         address owner = ownerOf(tokenId);
         require(!checkDelegates(msg.sender,tokenId),"asset cannot be delegated more than once");
         require(_msgSender() != owner, "ERC4610: setDelegator to current owner");
-        require(!_rented[msg.sender][tokenId],"you cannot rent same asset more than once");
         require(msg.value == 0.1 ether);
         _setDelegator(msg.sender, tokenId);
         _balances[tokenId] += msg.value;
