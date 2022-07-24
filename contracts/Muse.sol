@@ -13,8 +13,6 @@ contract Muse is ERC4610{
     // Optional mapping for token URIs
     mapping(uint256 => string) public _tokenURIs;
 
-    mapping(address => mapping(uint => bool)) private _rented;
-
     mapping(address => string[]) private _myNFts;
     // Mapping owner address to token count
     mapping(uint256 => uint256) private _balances;
@@ -53,7 +51,6 @@ contract Muse is ERC4610{
         require(msg.value == 0.1 ether);
         _setDelegator(msg.sender, tokenId);
         _balances[tokenId] += msg.value;
-        _rented[msg.sender][tokenId] = true;
         _myNFts[msg.sender].push(_tokenURIs[tokenId]);
         emit rented(tokenId, _tokenURIs[tokenId],owner,msg.sender);
     }
